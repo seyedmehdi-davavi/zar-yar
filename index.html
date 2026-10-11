@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>زر یار - دستیار هوشمند طلا و سکه</title>
+  <style>
+    :root {
+      --bg-dark: #0f1f17;
+      --card-bg: #162c21;
+      --accent-gold: #e5b854;
+      --gold-gradient: linear-gradient(135deg, #f7d070, #c89528);
+      --text-main: #f0f4f1;
+      --text-dim: #9eb1a6;
+      --border-color: #274737;
+      --success: #2ecc71;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, 'Vazirmatn', sans-serif; }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      padding: 16px;
+      padding-bottom: 40px;
+    }
+    .header {
+      text-align: center;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      font-size: 22px;
+      color: var(--accent-gold);
+      margin-bottom: 6px;
+    }
+    .header p {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .tab-btn {
+      flex: 1;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-dim);
+      padding: 12px 6px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: var(--gold-gradient);
+      color: #0b1510;
+      border-color: transparent;
+    }
+    .content-card {
+      display: none;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 18px;
+    }
+    .content-card.active { display: block; }
+    .form-group {
+      margin-bottom: 14px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+    input, select {
+      width: 100%;
+      background: #0a1711;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px;
+      color: #fff;
+      font-size: 15px;
+      direction: ltr;
+      text-align: right;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent-gold);
+    }
+    .calc-btn {
+      width: 100%;
+      background: var(--gold-gradient);
+      color: #0a1711;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      padding: 13px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .result-box {
+      margin-top: 20px;
+      padding: 15px;
+      background: #0d1a13;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      display: none;
+    }
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+    .result-row.total {
+      border-top: 1px dashed var(--border-color);
+      padding-top: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--accent-gold);
+    }
+    .info-badge {
+      font-size: 12px;
+      color: #92b5a0;
+      line-height: 1.6;
+      margin-top: 14px;
+      background: rgba(229, 184, 84, 0.05);
+      border-right: 3px solid var(--accent-gold);
+      padding: 8px 12px;
+      border-radius: 0 8px 8px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>حسابدار هوشمند طلا و سکه (زر یار)</h1>
+    <p>محاسبه قانونی قیمت خرید، فروش و حباب انواع سکه</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('buy')">خرید طلا</button>
+    <button class="tab-btn" onclick="switchTab('sell')">فروش طلا</button>
+    <button class="tab-btn" onclick="switchTab('bubble')">حباب سکه</button>
+  </div>
+
+  <!-- بخش خرید طلا -->
+  <div id="tab-buy" class="content-card active">
+    <div class="form-group">
+      <label>قیمت یک گرم طلای ۱۸ عیار خام (تومان):</label>
+      <input type="number" id="buy-gram-price" placeholder="مثال: 4500000">
+    </div>
+    <div class="form-group">
+      <label>وزن طلا (گرم):</label>
+      <input type="number" id="buy-weight" step="0.01" placeholder="مثال: 4.35">
+    </div>
+    <div class="form-group">
+      <label>درصد اجرت ساخت (%):</label>
+      <input type="number" id="buy-ojrat" step="0.5" placeholder="مثال: 14">
+    </div>
+    <button class="calc-btn" onclick="calculateBuy()">محاسبه قیمت نهایی فاکتور</button>
+
+    <div id="buy-result" class="result-box">
+      <div class="result-row"><span>قیمت طلای خام:</span><span id="buy-raw">۰ تومان</span></div>
+      <div class="result-row"><span>اجرت ساخت:</span><span id="buy-ojrat-val">۰ تومان</span></div>
+      <div class="result-row"><span>سود قانونی فروشنده (۷٪):</span><span id="buy-profit-val">۰ تومان</span></div>
+      <div class="result-row"><span>مالیات بر ارزش افزوده (۹٪ از اجرت و سود):</span><span id="buy-tax-val">۰ تومان</span></div>
+      <div class="result-row total"><span>مبلغ نهایی پرداختی:</span><span id="buy-total">۰ تومان</span></div>
+    </div>
+    <div class="info-badge">طبق مصوبه رسمی، مالیات ۹٪ فقط به اجرت و سود تعلق می‌گیرد، نه به اصل طلا.</div>
+  </div>
+
+  <!-- بخش فروش طلا -->
+  <div id="tab-sell" class="content-card">
+    <div class="form-group">
+      <label>قیمت تابلو یک گرم طلای ۱۸ عیار (تومان):</label>
+      <input type="number" id="sell-gram-price" placeholder="مثال: 4500000">
+    </div>
+    <div class="form-group">
+      <label>وزن طلای شما (گرم):</label>
+      <input type="number" id="sell-weight" step="0.01" placeholder="مثال: 8.5">
+    </div>
+    <div class="form-group">
+      <label>کسر بابت نگین/ناخالصی (در صورت وجود، به گرم):</label>
+      <input type="number" id="sell-negin" step="0.01" value="0">
+    </div>
+    <button class="calc-btn" onclick="calculateSell()">محاسبه مبلغ دریافتی شما</button>
+
+    <div id="sell-result" class="result-box">
+      <div class="result-row"><span>وزن خالص طلا:</span><span id="sell-net-weight">۰ گرم</span></div>
+      <div class="result-row"><span>قیمت هر گرم خرید مستعمل (حدود ۲٪ زیر تابلو):</span><span id="sell-unit-price">۰ تومان</span></div>
+      <div class="result-row total"><span>مبلغی که طلافروش باید بدهد:</span><span id="sell-total">۰ تومان</span></div>
+    </div>
+  </div>
+
+  <!-- بخش حباب سکه -->
+  <div id="tab-bubble" class="content-card">
+    <div class="form-group">
+      <label>نوع سکه:</label>
+      <select id="coin-type">
+        <option value="emami">سکه تمام بهار آزادی (امامی)</option>
+        <option value="bahar">تمام بهار آزادی (طرح قدیم)</option>
+        <option value="nim">نیم سکه</option>
+        <option value="rob">ربع سکه</option>
+        <option value="gerami">سکه گرمی</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>قیمت روز یک گرم طلای ۱۸ عیار (تومان):</label>
+      <input type="number" id="bubble-gold-price" placeholder="مثال: 4500000">
+    </div>
+    <div class="form-group">
+      <label>قیمت بازار این سکه (تومان):</label>
+      <input type="number" id="bubble-market-price" placeholder="مثال: 51000000">
+    </div>
+    <button class="calc-btn" onclick="calculateBubble()">محاسبه حباب سکه</button>
+
+    <div id="bubble-result" class="result-box">
+      <div class="result-row"><span>ارزش ذاتی طلا در سکه:</span><span id="coin-real-val">۰ تومان</span></div>
+      <div class="result-row"><span>مبلغ حباب (اضافه قیمت):</span><span id="coin-bubble-val">۰ تومان</span></div>
+      <div class="result-row total"><span>درصد حباب سکه:</span><span id="coin-bubble-percent">۰ ٪</span></div>
+    </div>
+    <div class="info-badge">سکه با حباب بالا برای خرید پرریسک‌تر است و در نوسانات احتمال ضرر بیشتری دارد.</div>
+  </div>
+
+  <script>
+    function fmt(n) {
+      return Math.round(n).toLocaleString('fa-IR') + ' تومان';
+    }
+
+    function switchTab(name) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.content-card').forEach(c => c.classList.remove('active'));
+      if(name === 'buy') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('tab-buy').classList.add('active');
+      } else if(name === 'sell') {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('tab-sell').classList.add('active');
+      } else {
+        document.querySelectorAll('.tab-btn')[2].classList.add('active');
+        document.getElementById('tab-bubble').classList.add('active');
+      }
+    }
+
+    function calculateBuy() {
+      const gPrice = parseFloat(document.getElementById('buy-gram-price').value) || 0;
+      const weight = parseFloat(document.getElementById('buy-weight').value) || 0;
+      const ojratPct = parseFloat(document.getElementById('buy-ojrat').value) || 0;
+
+      if (!gPrice || !weight) return alert('لطفاً قیمت و وزن را وارد کنید');
+
+      const raw = gPrice * weight;
+      const ojrat = raw * (ojratPct / 100);
+      const profit = (raw + ojrat) * 0.07;
+      const tax = (ojrat + profit) * 0.09;
+      const total = raw + ojrat + profit + tax;
+
+      document.getElementById('buy-raw').innerText = fmt(raw);
+      document.getElementById('buy-ojrat-val').innerText = fmt(ojrat);
+      document.getElementById('buy-profit-val').innerText = fmt(profit);
+      document.getElementById('buy-tax-val').innerText = fmt(tax);
+      document.getElementById('buy-total').innerText = fmt(total);
+      document.getElementById('buy-result').style.display = 'block';
+    }
+
+    function calculateSell() {
+      const gPrice = parseFloat(document.getElementById('sell-gram-price').value) || 0;
+      const weight = parseFloat(document.getElementById('sell-weight').value) || 0;
+      const negin = parseFloat(document.getElementById('sell-negin').value) || 0;
+
+      if (!gPrice || !weight) return alert('لطفاً قیمت و وزن را وارد کنید');
+
+      const netWeight = Math.max(0, weight - negin);
+      const scrapUnit = gPrice * 0.98;
+      const total = netWeight * scrapUnit;
+
+      document.getElementById('sell-net-weight').innerText = netWeight.toLocaleString('fa-IR') + ' گرم';
+      document.getElementById('sell-unit-price').innerText = fmt(scrapUnit);
+      document.getElementById('sell-total').innerText = fmt(total);
+      document.getElementById('sell-result').style.display = 'block';
+    }
+
+    function calculateBubble() {
+      const gold18 = parseFloat(document.getElementById('bubble-gold-price').value) || 0;
+      const marketPrice = parseFloat(document.getElementById('bubble-market-price').value) || 0;
+      const type = document.getElementById('coin-type').value;
+
+      if (!gold18 || !marketPrice) return alert('لطفاً اطلاعات را کامل وارد کنید');
+
+      const goldCoinPerGram = gold18 * 1.2;
+      let coinWeight = 8.133;
+
+      if (type === 'nim') coinWeight = 4.066;
+      else if (type === 'rob') coinWeight = 2.033;
+      else if (type === 'gerami') coinWeight = 1.1;
+
+      const realVal = coinWeight * goldCoinPerGram;
+      const bubble = marketPrice - realVal;
+      const bubblePct = (bubble / realVal) * 100;
+
+      document.getElementById('coin-real-val').innerText = fmt(realVal);
+      document.getElementById('coin-bubble-val').innerText = (bubble > 0 ? '+' : '') + fmt(bubble);
+      document.getElementById('coin-bubble-percent').innerText = bubblePct.toFixed(1).toLocaleString('fa-IR') + ' ٪';
+      document.getElementById('bubble-result').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
